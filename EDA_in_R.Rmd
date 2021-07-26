@@ -1,0 +1,267 @@
+---
+title: "EDA - Phân tích khám phá dữ liệu"
+subtitle: "EDA in R with Heart Dataset"
+author:
+  - name: <h2>TRẦN QUANG QUÝ</h2>
+    affiliation:  Bộ môn Khoa học Máy tính & Công nghệ - 0818981166
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: 
+  rmdformats::readthedown:
+    toc: 3
+    css: style.css
+   # toc_float: true
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Feature Engineering
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Trong một bài toán Machine Learning thông thường, có thể nói Feature Engineering là bước quan trọng nhất quyết định đến chất lượng của mô hình dự đoán. Nếu coi mô hình là một cỗ máy, thì dữ liệu nguyên bản (raw data) giống như là dầu thô. Việc đổ "dầu thô" vào thẳng "cỗ máy dự đoán" chắc chắn sẽ mang lại kết quả không tốt. Vì vậy, attributes của dữ liệu nguyên bản cần được tinh lọc thành features trước khi đưa vào thuật toán Machine Learning. Việc tinh lọc này gọi là **Feature Engineering**.
+<center>
+![Feature Engineering](D:/Short Course Using R\EDA in R\EDA-in-R\EDA.JPG)
+
+</center>
+
+## Quy trình thực hiện Feature Engineering
+Quy trình thực hiện Feature Engineering gồm những bước nhỏ sau:
+
+ 1. Liệt kê features nhiều nhất có thể
+ 2. Quyết định features cần sử dụng
+ 3. Tạo ra features từ attributes
+ 4. Xác định ảnh hưởng của features lên mô hình
+ 5. Cải thiện features
+ 6. Quay lại bước 1 cho đến khi giải quyết được bài toán
+ 
+Tuy nhiên, để có thể chọn lọc ra features từ dữ liệu, chúng ta cần có một cái nhìn toàn cảnh về bộ dữ liệu đó.
+
+> "The most difficult thing in life is to know yourself." -- Thales of Miletus
+
+Một phương pháp đơn giản để hiểu được dữ liệu đó chính là **EDA** - Exploratory Data Analysis, phương pháp này được dịch ra là phân tích dữ liệu khám phá, khám phá ở đây có nghĩa là chúng ta đi dạo quanh dữ liệu và tìm hiểu xem bước đầu dữ liệu có gì đặc biệt, có thể **khám phá** điều gì mới mẻ.
+
+## EDA
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Exploratory Data Analysis (EDA) là một phương pháp phân tích dữ liệu chủ yếu sử dụng các kỹ thuật về biểu đồ, hình vẽ. Một tập dữ liệu là lớn sẽ không có ý nghĩa gì nếu chúng ta không khám phá các tri thức từ bộ dữ liệu đó, khi dữ liệu khám phá ra được các thông tin hữu ích thì khi đó bộ dữ liệu trở thành **tri thức** có giá trị với người làm phân tích dữ liệu. 
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Khác với statistical graphics, EDA không chỉ tập trung vào một phương diện đặc trưng nào của dữ liệu mà trực tiếp làm dữ liệu tự khám phá ra cấu trúc của nó, đồng thời giúp chúng ta có cơ sở để chọn mô hình trong các bước tiếp theo.
+
+Những kỹ thuật biểu đồ được sử dụng trong EDA thường khá đơn giản, bao gồm một vài kỹ thuật sau:
+
+  1. Vẽ dữ liệu nguyên bản sử dụng data traces, histograms, block plots, ...
+  2. Vẽ phân bố của dữ liệu nguyên bản sử dụng mean plots, standard deviation plots, box plots, ...
+  3. Sắp xếp các biểu đồ giúp tối đa hoá khả năng tự nhiên về nhận biết mô hình của con người.
+  
+## Khám phá dữ liệu HEART
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Trong bài viết này, chúng ta sẽ khám phá bộ dữ liệu bệnh tim có tên là **HEART**, được tải về từ Kaggle. Trong bộ dữ liệu này có khá nhiều biến số liên quan đến y học, tuy nhiên chúng ta cũng không cần quá quan trọng hóa vấn đề phải hiểu hết các biến số đó có ý nghĩa là gì mà đơn thuần là khám phá dữ liệu này trước tiên.
+
+Vui lòng tải dữ liệu [tại đây](https://www.kaggle.com/johnsmith88/heart-disease-dataset)
+
+```{r}
+# Load the Data from CSV file
+heart <- read.csv("D:/Short Course Using R/EDA in R/EDA-in-R/heart.csv")
+```
+
+### Mô tả một số biến số cơ bản trong HEART
+Một số biến số cơ bản có thể liệt kê ở đây là:
+
+  1. age: Tuổi của một người
+
+  2. giới tính: Giới tính (1 = nam, 0 = nữ)
+
+  3. cp: Các loại đau ngực đã trải qua (Giá trị 1: đau thắt ngực điển hình, Giá trị 2: đau thắt ngực không điển hình, Giá trị 3: đau không đau thắt ngực, Giá trị 4: không có triệu chứng)
+  
+  4. trestbps: Huyết áp khi nghỉ ngơi (mm Hg khi nhập viện)
+
+  5. chol: Đo nồng độ cholesterol tính bằng mg / dl
+
+  6. fbs: Đường huyết lúc đói (nếu> 120 mg / dl, 1 = true; 0 = false)
+
+  7. restecg: Đo điện tâm đồ khi nghỉ ngơi (0 = bình thường, 1 = có bất thường sóng ST-T, 2 = hiển thị phì đại thất trái có thể xảy ra hoặc xác định theo tiêu chuẩn của Estes)
+
+  8. thalach: Nhịp tim tối đa đạt được
+
+  9. exang: Đau thắt ngực do tập thể dục (1 = có; 0 = không)
+
+  10.oldpeak: ST trầm cảm gây ra do tập thể dục liên quan đến nghỉ ngơi ('ST' liên quan đến các vị trí trên đồ thị ECG)
+
+  11.slope: độ dốc của đoạn ST tập luyện đỉnh cao (Giá trị 1: dốc lên, Giá trị 2: bằng phẳng, Giá trị 3: dốc xuống)
+
+  12.ca: Các mạch máu chính, được tô màu theo Flourrosopy 
+
+  13.thal: Một chứng rối loạn máu được gọi là thalassemia (1 = bình thường; 2 = khiếm khuyết cố định; 3 = khiếm khuyết có thể hồi phục)
+
+  14. thal: biến mục tiêu Bệnh tim cần dự đoán (0 = không, 1 = có)
+
+### Chuẩn bị dữ liệu
+Tập dữ liệu đã sạch và được tổ chức tốt. Không cần làm sạch quá nhiều. Để bắt đầu, sẽ rất hữu ích khi xem mối tương quan giữa bệnh tim và các biến khác trong tập dữ liệu. Tôi sẽ sử dụng thư viện 'corrplot' và lập một biểu đồ tương quan sẽ cho thấy mối tương quan của từng biến với những biến khác.
+
+```{r}
+library(corrplot)
+corrplot(cor(heart), type="upper")
+```
+Biểu đồ tương quan này cho thấy rằng các tham số 'restecg', 'fbs' và 'chol' có tương quan rất ít với 'biến mục tiêu'. Chúng ta có thể xóa chúng khỏi tập dữ liệu một cách an toàn cho nghiên cứu cụ thể này.
+
+```{r}
+heart = subset(heart, select=c(-restecg, -chol,-fbs))
+```
+
+Nhưng các biến phân loại được biểu thị là 0, 1, 2, 3. Tức là chúng đã được mã hóa thành các con số, để thuận tiện hơn chúng ta sẽ mã hóa ngược lại thành các nội dung có ý nghĩa hơn. Dưới đây là các mã để thay đổi các biến phân loại thành các chuỗi tương ứng:
+
+```{r}
+library(DT)
+library(dplyr)
+heart$sex[heart$sex == 0] = "female"
+heart$sex[heart$sex == 1] = "male"
+heart$cp[heart$cp == 0] = "typical angina"
+heart$cp[heart$cp == 1] = "atypical angina"
+heart$cp[heart$cp == 2] = "non-anginal pain"
+heart$cp[heart$cp == 3] = "asymptomatic"
+heart$exang[heart$exang == 0] = "no"
+heart$exang[heart$exang == 1] = "yes"
+heart$slope[heart$slope == 0] = "upsloping"
+heart$slope[heart$slope == 1] = "flat"
+heart$slope[heart$slope == 2] = "downsloping"
+heart$thal[heart$thal == 1] = "normal"
+heart$thal[heart$thal == 2] = "fixed defect"
+heart$thal[heart$thal == 3] = "reversible defect"
+heart$target1 = heart$target
+heart$target1[heart$target1 == 0] = "no heart disease"
+heart$target1[heart$target1 == 1] = "heart disease"
+heart %>% 
+  head() %>% 
+  datatable()
+  
+```
+
+### Phân tích thăm dò
+Chúng ta bắt đầu với câu hỏi thứ nhất? Tìm hiểu xem tỷ lệ người bị bệnh tim và người không bị bệnh tim trong tập dữ liệu này là bao nhiêu
+
+```{r}
+round(prop.table(table(heart$target1)),2)
+```
+
+Câu hỏi tiếp theo được đặt ra là: Đa số mọi người đều cho rằng người già có nguy cơ mắc bệnh tim cao hơn so với các lứa tuổi khác, chúng ta khám phá trực quan dữ liệu cho biến tuổi để tìm hiểu
+
+```{r}
+library(ggplot2)
+ggplot(data = heart, mapping = aes(x=age)) +
+  geom_histogram(color = "red", fill = "orange") + 
+  ggtitle("Distribution of age of the population") +
+  xlab("Age") + 
+  ylab("Density")
+```
+
+Tuy nhiên biểu đồ trên cho thấy các độ tuổi khá nhiều, chúng ta chia biến tuổi thành các nhóm để thuận tiện phân tích
+
+```{r}
+heart$age_grp = cut(heart$age, breaks = seq(25, 77, 4))
+target_by_age = heart %>%
+        group_by(age_grp) %>%
+        summarise(heart_disease = sum(target))
+target_by_age
+```
+
+Như vậy bộ dữ liệu lại cho ra kết quả khá khác so với nhận định ban đầu, đa số người bị bệnh tim lại rơi vào độ tuổi từ 49 đến 57, trong khi những độ tuổi từ 61 trở lên lại ít hơn.
+
+```{r}
+library(ggthemes)
+target_by_age %>%
+  ggplot(aes(x=age_grp, y=heart_disease)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    xlab("") + ylab("No. of People with Heart Disease") + ggtitle("No of Heart disease in Age Group") + 
+    theme_economist()
+
+```
+
+Để hiểu thêm về độ tuổi bị bệnh tim, tỷ lệ bệnh nhân bệnh tim ở từng nhóm tuổi sẽ giúp ích. Vì vậy, chúng ta hãy tìm tỷ lệ người mắc bệnh tim trong mỗi nhóm.
+
+```{r}
+prop_in_age = heart %>%
+        group_by(age_grp) %>%
+        summarise(heart_disease_proportion = round(sum(target)/n(), 3)*100)
+prop_in_age
+# Visualization the data with ggplot2
+prop_in_age %>%
+  ggplot(aes(x=age_grp, y=heart_disease_proportion)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    xlab("") + ylab("Proportion of People with Heart Disease") + ggtitle("Proportion of Heart disease in Age Groups") + 
+    theme_economist()
+```
+
+Câu hỏi đặt ra tiếp theo là biến giới tính có mối liên hệ gì với bệnh tim hay không. Trước tiên, chúng ta tìm hiểu về số lượng giới tính.
+
+```{r}
+round(prop.table(table(heart$sex)),2)
+round(prop.table(table(heart$sex, heart$target1)), 2)
+
+```
+Như vậy, đa số các đối tượng trong bộ dữ liệu là Nam giới, với tỷ lệ là 70%, tỷ lệ mắc bệnh tim ở Nam giới trong bộ dữ liêu này cũng là cao nhất với 40% Nam giới mắc bệnh tim.
+
+Chúng ta cùng trực quan hóa biến độ dốc (slope)
+```{r}
+ggplot(heart, aes(x= slope, fill=target1)) + 
+  geom_bar(position = 'dodge') +
+  xlab("Type of Slope") +
+  ylab("Count") +
+  ggtitle("Analysis of types of slope") +
+  scale_fill_discrete(name = "Heart disease", labels = c("No", "Yes"))
+
+male_data = heart[heart$sex=="male",]
+female_data = heart[heart$sex=="female",]
+
+ggplot(male_data, aes(x= slope, fill=target1)) + 
+  geom_bar(position = 'dodge') +
+  xlab("Type of Slope") +
+  ylab("Count") +
+  ggtitle("Analysis of types of slope for males") +
+  scale_fill_discrete(name = "Heart disease", labels = c("No", "Yes"))
+
+ggplot(female_data, aes(x= slope, fill=target1)) + 
+  geom_bar(position = 'dodge') +
+  xlab("Type of Slope") +
+  ylab("Count") +
+  ggtitle("Analysis of types of slope for females") +
+  scale_fill_discrete(name = "Heart disease", labels = c("No", "Yes"))
+```
+
+Tập dữ liệu cho thấy có thể có 0, 1, 2, 3 hoặc 4 mạch máu chính trong cơ thể của một người. Theo biểu đồ tương quan, số lượng mạch có mối tương quan lớn với bệnh tim. Dưới đây là hình ảnh đại diện cho thấy sự khác nhau giữa số lượng các mạch chính liên quan đến bệnh tim:
+```{r}
+mosaicplot(table(heart$target1, heart$ca), col=c("#754869", "coral", "skyblue", "#423f42", "#ed18c6"), las=1, main="Heart Disease for Major Vessels")
+```
+Dân số nam và nữ có thể có số lượng các mạch chính khác nhau hoặc mức độ khác nhau về mối liên hệ giữa các mạch chính và bệnh tim. Dưới đây là một biểu đồ cho thấy các mạch chính so với bệnh tim ở nam giới:
+```{r}
+mosaicplot(table(male_data$target1, male_data$ca), col=c("#754869", "coral", "skyblue", "#423f42", "#ed18c6"), las=1, main="Major Vessels in Males")
+```
+Dành cho nữ giới:
+```{r}
+mosaicplot(table(female_data$target1, female_data$ca), col=c("#754869", "coral", "skyblue", "#423f42", "#ed18c6"), las=1, main="Major Vessels in Females")
+
+```
+Dưới đây là các ô trống cho thấy sự phân bố của tình trạng bị trầm cảm đối với người bệnh tim và người không mắc bệnh tim.
+
+```{r}
+ggplot(heart, aes(x = target1, y = oldpeak)) + ylab("ST Depression") + xlab("Haert Disease State")+ ggtitle("ST Depression Induced by Exercise vs Haert Disease")+
+        geom_boxplot()
+```
+Loại trầm cảm này có thay đổi theo tuổi tác và chúng có tác động khác nhau đến tình trạng bệnh tim không?
+
+```{r}
+ggplot(heart, aes(x = age, y = oldpeak,color=target1, size = factor(oldpeak))) + 
+    geom_point(alpha=0.3) + labs(color = "Heart Disease State")+guides(size=FALSE) + xlab("Age") + ylab("ST Depression") + ggtitle("Age vs Resting Blood Pressure Separated by Heart Condition")
+```
+Huyết áp khi không hoạt động được trực quan hóa như sau:
+
+```{r}
+ggplot(heart, aes(x = target1, y = trestbps)) +
+        geom_boxplot() + xlab("Heart Disease State") + ylab("Resting Blood Pressure") + ggtitle("Boxplots of Resting Blood Pressure by Heart Condition")
+
+ggplot(data=heart,aes(x=age,y=trestbps,color=target1,size=factor(oldpeak)))+
+geom_point(alpha=0.3)+
+  xlab("Age")+
+  ylab("Resting blood sugar") + 
+  labs(color="Heart Disease State") + 
+  guides(size=FALSE)+
+  ggtitle("Age vs Resting Blood Pressure Separated by Heart Condition")
+```
+
+Như chúng ta đã thấy  hầu hết các chấm lớn có màu xanh lam. Điều đó có nghĩa là có nhiều người mắc bệnh trầm cảm ST không bị bệnh tim. Đồng thời, số lượng chấm lớn hơn ở độ tuổi cao hơn. Vì vậy, trầm cảm ST cao hơn ở người lớn tuổi.
