@@ -3,7 +3,7 @@ title: "EDA - Phân tích khám phá dữ liệu"
 subtitle: "EDA in R with Heart Dataset"
 author:
   - name: <h2>TRẦN QUANG QUÝ</h2>
-    affiliation:  Bộ môn Khoa học Máy tính & Công nghệ - 0818981166
+    affiliation:  Bộ môn Khoa học Máy tính & Công nghệ - Đại học CNTT & TT Thái Nguyên. 0818981166
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: 
   rmdformats::readthedown:
@@ -19,11 +19,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Feature Engineering
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Trong một bài toán Machine Learning thông thường, có thể nói Feature Engineering là bước quan trọng nhất quyết định đến chất lượng của mô hình dự đoán. Nếu coi mô hình là một cỗ máy, thì dữ liệu nguyên bản (raw data) giống như là dầu thô. Việc đổ "dầu thô" vào thẳng "cỗ máy dự đoán" chắc chắn sẽ mang lại kết quả không tốt. Vì vậy, attributes của dữ liệu nguyên bản cần được tinh lọc thành features trước khi đưa vào thuật toán Machine Learning. Việc tinh lọc này gọi là **Feature Engineering**.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Feature Engineering là qúa trình chuyển đổi tập dữ liệu thô ban đầu thành tập các thuộc tính (features) có thể giúp biểu diễn tập dữ liệu ban đầu tốt hơn, tạo điều kiện để giải quyết các bài toán dễ dàng hơn, giúp tương thích với từng mô hình dự đoán cụ thể, cũng như cải thiện độ chính xác của mô hình dự đoán hiện tại.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Feature engineering cố gắng biểu diễn tốt nhất tập dữ liệu ban đầu sao cho tương thích với mô hình dự đoán bạn đang sử dụng. Xét bài toán dự đoán sinh viên này có khả năng bỏ học là bao nhiêu phần trăm. Thông thường, ta sẽ sử dụng tất cả các thuộc tính liên quan đến sinh viên đó để áp dụng cho bài toán phân lớp, mà các thuộc tính này thường rất nhiều từ 20-50 cột thuộc tính. Tuy nhiên, khi đưa toàn bộ thuộc tính này vào mô hình phân lớp của mình (ví dụ mô hình cây quyết định), thời gian để máy traing rất lâu, đồng thời kết qủa dự đoán có độ chính xác thấp. Thay vì làm như vậy, ta sử dụng kĩ thuật feature engineering để chọn ra một số thuộc tính phù hợp hơn như có vay mượn để đóng học phí không, số điểm đầu vào là bao nhiêu, qúa trình tiến bộ trong học tập là bao nhiêu,… Ngoài ra, ta có thể thu thập thêm các thuộc tính cần thiết khác để bổ sung vào tập dữ liệu ban đầu như có tham gia nhiều hoạt động ngoại khóa hay không, có được hỗ trợ vào kí túc xá hay không,… Thì số thuộc tính đưa vào mô hình phân lớp được giảm đi đáng kể giúp tốc độ để máy training nhanh hơn. Hơn nữa, nhờ biểu diễn tốt tập dữ liệu ban đầu mà độ chính xác mô hình phân lớp được cải thiện đáng kể.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cũng như lập trình là một nghệ thuật, giao tiếp là một nghệ thuật, hay khám chữa bệnh là một nghệ thuật thì feature engineering cũng là một nghệ thuật. Do tập dữ liệu trên thực tế phức tạp hơn rất nhiều so với các gỉa định trong nghiên cứu, thêm vào đó các bài toán trong thực tế luôn luôn biến đổi và đòi hỏi những nhà khoa học dữ liệu phải biết thích nghi trong từng trường hợp để đưa ra cách xây dựng mô hình phù hợp nhất. Vì vậy, việc thêm bớt, chỉnh sửa các thuộc tính cho tập dữ liệu ban đầu sao cho có thể cải thiện tốc độ tính toán cũng như nâng cao độ chính xác của mô hình là một nghệ thuật. Để đạt được trình độ này, đòi hỏi chúng ta phải va chạm nhiều các bài toán thực tế, đồng thời học hỏi từ cộng đồng để nâng cao kiến thức cũng như kinh nghiệm cho bản thân.
+
 <center>
 ![Feature Engineering](D:/Short Course Using R\EDA in R\EDA-in-R\EDA.JPG)
 
 </center>
-
 ## Quy trình thực hiện Feature Engineering
 Quy trình thực hiện Feature Engineering gồm những bước nhỏ sau:
 
@@ -33,8 +39,12 @@ Quy trình thực hiện Feature Engineering gồm những bước nhỏ sau:
  4. Xác định ảnh hưởng của features lên mô hình
  5. Cải thiện features
  6. Quay lại bước 1 cho đến khi giải quyết được bài toán
- 
-Tuy nhiên, để có thể chọn lọc ra features từ dữ liệu, chúng ta cần có một cái nhìn toàn cảnh về bộ dữ liệu đó.
+
+<center>
+![Feature Engineering](D:/Short Course Using R\EDA in R\EDA-in-R\feature-engineering.png)
+
+</center>
+Tuy nhiên, để có thể chọn lọc ra features từ dữ liệu, chúng ta cần có một cái nhìn toàn cảnh về bộ dữ liệu đó. Có thể đọc thêm [tại đây](https://ongxuanhong.wordpress.com/2015/10/29/feature-engineering-la-gi/)
 
 > "The most difficult thing in life is to know yourself." -- Thales of Miletus
 
